@@ -1,0 +1,9 @@
+- hosts: node
+  remote_user: root
+  tasks:
+  - name: mkdir 
+    shell: mkdir -p /u01/oracle/gsm 
+  - name: chmod
+    shell: chmod -R 775 /u01/oracle/gsm
+  - name: chown
+    shell: chown -R oracle:oinstall /u01/oracle/gsm 
