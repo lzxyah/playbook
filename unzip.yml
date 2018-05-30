@@ -1,0 +1,12 @@
+- hosts: tmp
+  remote_user: root
+  tasks:
+  - name: unzip 
+    shell: unzip "{{ item }}" -d /u01/soft/
+    with_items:
+     - /u01/V46095-01_1of2.zip 
+     - /u01/V46095-01_2of2.zip
+  - name: chmod
+    shell: chmod -R 775 /u01 
+  - name: chown
+    shell: chown -R oracle:oinstall /u01

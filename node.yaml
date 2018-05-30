@@ -27,6 +27,7 @@
      - 'ksh'
      - 'compat-libcap1'
      - 'compat-libstdc++-33'
+     - 'libaio-devel'
     tags:
       - rpm
   - name: create
@@ -74,3 +75,10 @@
     shell: ln -sf /lib/systemd/system/runlevel5.target /etc/systemd/system/default.target
     tags:
       - desktop2
+  - name: copy
+    copy:
+       src: /opt/
+       dest: /u01/
+       mode: 0777
+    tags:
+     - copy

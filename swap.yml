@@ -1,0 +1,13 @@
+- hosts: tmp
+  remote_user: root
+  tasks:
+  - name: dd 18g
+    shell: dd if=/dev/zero of=/.swap bs=1024 count=18000000
+  - name: chmod 0600
+    shell: chmod 0600 /.swap 
+  - name: mkswap
+    shell: mkswap /.swap
+  - name: swapon
+    shell: swapon /.swap
+  - name: fstab
+    shell: echo "/.swap              swap                    swap    defaults        0 0" >> /etc/fstab

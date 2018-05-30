@@ -1,0 +1,28 @@
+- hosts: node
+  remote_user: root
+  tasks:
+  - name: fetch
+    fetch:
+     src: "{{ item }}"
+     dest: /tmp/
+     flat: yes
+    with_items:
+      - /u01/download/V974949-01.zip
+      - /u01/download/V974952-01.zip
+      - /u01/download/V974953-01.zip
+      - /u01/download/wgetlog-05-25-18-10:37.log  
+    vars:
+       ansible_ssh_host : 172.16.18.31  
+    tags:
+      - fetch
+  - name: copy
+    copy:
+      src: "{{ item }}"
+      dest: /u01/{{ item }}
+      mode: 0777
+    with_items:
+      - 'V974949-01.zip'
+      - 'V974952-01.zip'
+      - 'V974953-01.zip'
+    tags:
+      - copy
