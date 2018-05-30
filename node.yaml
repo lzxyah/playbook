@@ -27,8 +27,6 @@
      - 'ksh'
      - 'compat-libcap1'
      - 'compat-libstdc++-33'
-    async: 300
-    poll: 10
     tags:
       - rpm
   - name: create
@@ -69,8 +67,6 @@
     with_items:
       - '@^gnome-desktop-environment'
       - '@Graphical Administration Tools'
-    async: 300
-    poll: 10
     tags:
       - desktop1
     ignore_errors: True
