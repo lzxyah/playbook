@@ -2,9 +2,9 @@
 set timeout 5
 spawn passwd oracle 
 expect "New password:"
-send "wRG2EM%F!pG3XpgZnwcz"
+send "wz"
 EOF
 expect "Retype new password:"
-send "wRG2EM%F!pG3XpgZnwcz"
+send "wz"
 EOF
 interact
