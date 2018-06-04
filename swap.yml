@@ -1,4 +1,4 @@
-- hosts: tmp
+- hosts: 172.16.18.31
   remote_user: root
   tasks:
   - name: dd 18g

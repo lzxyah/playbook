@@ -82,3 +82,46 @@
        mode: 0777
     tags:
      - copy
+  - name: mkdir
+    file:
+      path: /u01/soft
+      state: directory
+      mode: 0755
+      owner: oracle
+      group: oinstall
+    tags:
+     - unzip 
+  - name: unzip 
+    unarchive: 
+      src: "{{ item }}" 
+      dest: /u01/soft
+      remote_src: yes
+      owner: oracle
+      group: oinstall
+      mode: 01777
+    with_items:
+       - /u01/12c/V46095-01_1of2.zip
+       - /u01/12c/V46095-01_2of2.zip
+       - /u01/12c/V840019-01.zip
+    tags:
+     - unzip 
+  - name: dd 18g
+    shell: dd if=/dev/zero of=/.swap bs=1024 count=18000000
+    tags:
+     - swap
+  - name: chmod 0600
+    shell: chmod 0600 /.swap 
+    tags:
+     - swap
+  - name: mkswap
+    shell: mkswap /.swap
+    tags:
+     - swap
+  - name: swapon
+    shell: swapon /.swap
+    tags:
+     - swap
+  - name: fstab
+    shell: echo "/.swap              swap                    swap    defaults        0 0" >> /etc/fstab
+    tags:
+     - swap

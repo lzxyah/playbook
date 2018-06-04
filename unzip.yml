@@ -1,12 +1,22 @@
-- hosts: tmp
+- hosts: node
   remote_user: root
   tasks:
+  - name: mkdir
+    file:
+      path: /u01/soft
+      state: directory
+      mode: 0755
+      owner: oracle
+      group: oinstall
   - name: unzip 
-    shell: unzip "{{ item }}" -d /u01/soft/
+    unarchive: 
+      src: "{{ item }}" 
+      dest: /u01/soft
+      remote_src: yes
+      owner: oracle
+      group: oinstall
+      mode: 01777
     with_items:
-     - /u01/V46095-01_1of2.zip 
-     - /u01/V46095-01_2of2.zip
-  - name: chmod
-    shell: chmod -R 775 /u01 
-  - name: chown
-    shell: chown -R oracle:oinstall /u01
+       - /u01/12c/V46095-01_1of2.zip
+       - /u01/12c/V46095-01_2of2.zip
+       - /u01/12c/V840019-01.zip
