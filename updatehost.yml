@@ -1,0 +1,10 @@
+- hosts: node
+  remote_user: root
+  tasks:
+  - name: host
+    shell: echo "{{ item }}" >> /etc/hosts
+    with_items:
+      - '172.16.18.31 node1'
+      - '172.16.18.32 node2'
+      - '172.16.18.33 node3'
+      - '172.16.18.34 node4'

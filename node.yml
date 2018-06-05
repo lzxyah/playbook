@@ -30,13 +30,6 @@
      - 'libaio-devel'
     tags:
       - rpm
-  - name: create
-    file:
-     path: "{{ item }}"
-     state: directory
-     mode: 0755
-    with_items:
-     - /u01
   - name: group
     group:
      name: "{{ item }}"
@@ -54,6 +47,18 @@
      state: present
     with_items:
      - oracle
+  - name: create
+    file:
+     path: "{{ item }}"
+     state: directory
+     mode: 0755
+     owner: oracle
+     group: oinstall
+    with_items:
+      - /u01
+      - '/u01/oracle/db_home_1'
+      - '/u01/oracle/gsm'
+      - '/u01/soft'
   - name: change name
     raw: "echo {{hostname|quote}} > /etc/hostname"
   - name:
@@ -75,36 +80,6 @@
     shell: ln -sf /lib/systemd/system/runlevel5.target /etc/systemd/system/default.target
     tags:
       - desktop2
-  - name: copy
-    copy:
-       src: /opt/12c
-       dest: /u01/
-       mode: 0777
-    tags:
-     - copy
-  - name: mkdir
-    file:
-      path: /u01/soft
-      state: directory
-      mode: 0755
-      owner: oracle
-      group: oinstall
-    tags:
-     - unzip 
-  - name: unzip 
-    unarchive: 
-      src: "{{ item }}" 
-      dest: /u01/soft
-      remote_src: yes
-      owner: oracle
-      group: oinstall
-      mode: 01777
-    with_items:
-       - /u01/12c/V46095-01_1of2.zip
-       - /u01/12c/V46095-01_2of2.zip
-       - /u01/12c/V840019-01.zip
-    tags:
-     - unzip 
   - name: dd 18g
     shell: dd if=/dev/zero of=/.swap bs=1024 count=18000000
     tags:
@@ -125,3 +100,128 @@
     shell: echo "/.swap              swap                    swap    defaults        0 0" >> /etc/fstab
     tags:
      - swap
+
+  - name: rm file
+    file:
+      name: "{{ item }}"
+      state: absent
+    with_items:
+      - /home/oracle/oracle.env
+      - /home/oracle/gsm.env
+    tags:
+     - env
+     - rm
+  - name: oracle.env
+    shell: echo "{{ item }}" >> /home/oracle/oracle.env
+    with_items:
+      - 'export ORACLE_BASE=/u01/oracle'
+      - 'export ORACLE_HOME=\$ORACLE_BASE/db_home_1'
+      - 'export ORACLE_SID=PRD1'
+      - 'export PATH=\$ORACLE_HOME/bin:\$PATH'
+    tags:
+     - env
+  - name: gsm.env
+    shell: echo "{{ item }}" >> /home/oracle/gsm.env
+    with_items:
+      - 'export ORACLE_BASE=/u01/oracle'
+      - 'export ORACLE_HOME=\$ORACLE_BASE/gsm'
+      - 'export GSM_HOME=\$ORACLE_BASE/gsm'
+      - 'export PATH=\$ORACLE_HOME/bin:\$PATH'
+    tags:
+     - env
+  - name: chmod chown
+    file:
+      name: "{{ item }}"
+      mode: 0777
+      owner: oracle
+      group: oinstall
+    with_items:
+      - /home/oracle/oracle.env
+      - /home/oracle/gsm.env
+    tags:
+     - env
+  - name: mkdir
+    file:
+      path: "{{ item }}"
+      state: directory
+      mode: 0755
+      owner: oracle
+      group: oinstall
+    with_items:
+      - '/u01/oracle/db_home_1'
+      - '/u01/oracle/gsm'
+    tags:
+     - env
+  - name: chmod chown
+    file:
+      name: "{{ item }}"
+      mode: 0775
+      owner: oracle
+      group: oinstall
+    with_items:
+      - /u01
+    tags:
+     - env
+  - name: limits
+    shell: echo "{{ item }}" >> /etc/security/limits.d/99-oracle.conf 
+    with_items:
+      - 'oracle  hard  nofile  65536'
+      - 'oracle  soft  nofile  65536'
+      - 'oracle  soft  stack   10240'
+    tags:
+     - env
+     - limits
+  - name: sysctl
+    shell: echo "{{ item }}" >> /etc/sysctl.d/99-oracle.conf
+    with_items:
+      - 'kernel.sem = 250 32000 100 128'
+      - 'kernel.shmmax = 8328693760'
+      - 'kernel.shmmni = 4096'
+      - 'kernel.shmall = 1626698'
+      - 'fs.file-max = 6815744'
+      - 'net.ipv4.ip_local_port_range = 9000   65535'
+      - 'net.core.rmem_default = 262144'
+      - 'net.core.rmem_max = 4194304'
+      - 'net.core.wmem_default = 262144'
+      - 'net.core.wmem_max = 1048576'
+      - 'fs.aio-max-nr = 1048576'
+    tags:
+     - env
+  - name: sysctl
+    shell: sysctl -p 
+    tags:
+     - env
+  - name: chmod chown
+    file:
+      name: "{{ item }}"
+      mode: 0775
+    with_items:
+      - /etc/security/limits.d/99-oracle.conf
+      - /etc/sysctl.d/99-oracle.conf
+    tags:
+     - env
+  - name: copy zip
+    copy:
+      src: /opt/12.2.0.1/{{ item }}
+      dest: /u01/soft/{{ item }}
+      owner: oracle
+      group: oinstall
+      mode: 0775
+    with_items:
+      - 'V839960-01.zip'
+      - 'V840019-01.zip'
+    tags:
+     - copy 
+  - name: unzip 
+    unarchive: 
+      src: /u01/soft/{{ item }}
+      dest: /u01/soft
+      remote_src: yes
+      owner: oracle
+      group: oinstall
+      mode: 01777
+    with_items:
+      - 'V839960-01.zip'
+      - 'V840019-01.zip'
+    tags:
+     - copy 
