@@ -1,0 +1,32 @@
+ - hosts: node
+   remote_user: root
+   serial: 4
+   gather_facts: no
+   tasks:
+    - name: copy yum
+      copy:
+        src: /opt/{{ item }}
+        dest: /tmp/{{ item }}
+        owner: root
+        group: root
+        mode: 0777
+      with_items:
+       - 'mysql57-community-release-el7-7.noarch.rpm'
+    - name: yum localinstall
+      shell: yum localinstall -y /tmp/mysql57-community-release-el7-7.noarch.rpm
+    - name: create user
+      user: 
+        name: mysql
+        group: oinstall
+        groups: oinstall,dba
+        state: present
+      tags:
+        - install
+    - name: yum mysql-server
+      yum:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - 'mysql-server'
+      tags:
+        - install

@@ -1,0 +1,14 @@
+ - hosts: node
+   remote_user: root
+   serial: 4
+   gather_facts: no
+   tasks:
+    - name: mysql service
+      service:
+        name: mysqld
+        state: stopped
+    - name: remove mysqld.log
+      shell: rm -rfv "{{ item }}"
+      with_items:
+        - /var/log/mysql*
+        - /var/lib/mysql
